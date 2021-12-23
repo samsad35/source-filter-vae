@@ -7,6 +7,7 @@ class TestAudioTools(unittest.TestCase):
         audio = AudioTools()
         signal, rate = audio.load(path_wav=r"D:\These\data\Audio\LJSpeech-1.1\wavs\LJ001-0015.wav", resample=16000)
         self.assertEqual(rate, 16000)
+        # audio.play(signal)
         self.assertEqual(len(signal.shape), 1)
 
     def test_stft(self):
@@ -20,6 +21,7 @@ class TestAudioTools(unittest.TestCase):
         signal, rate = audio.load(path_wav=r"D:\These\data\Audio\LJSpeech-1.1\wavs\LJ001-0015.wav", resample=16000)
         mel, spec, phase = audio.stft(signal)
         signal_ = audio.istft(spec, phase)
+        # audio.play(signal_)
         self.assertEqual(signal_.shape, signal.shape)
 
 

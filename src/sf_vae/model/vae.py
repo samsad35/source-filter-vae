@@ -7,20 +7,20 @@ class VAE(nn.Module):
         Class : Variational Auto Encoder (VAE) with only linear Layer ---> (Frame of spectrograme)
     """
 
-    def __init__(self, param_vae=None):
+    def __init__(self):
         super(VAE, self).__init__()
 
         # MLP :   x --> z : q(z|x)
-        self.fc1 = nn.Linear(param_vae['x_dim'], 256)
+        self.fc1 = nn.Linear(513, 256)
         self.fc2 = nn.Linear(256, 64)
         # -----
-        self.fc31 = nn.Linear(64, param_vae['latent_dim'])  # for the mean
-        self.fc32 = nn.Linear(64, param_vae['latent_dim'])  # for the log var
+        self.fc31 = nn.Linear(64, 16)  # for the mean
+        self.fc32 = nn.Linear(64, 16)  # for the log var
         # -----
         # MLP :   z --> x : p(x|z)
-        self.fc4 = nn.Linear(param_vae['latent_dim'], 64)
+        self.fc4 = nn.Linear(16, 64)
         self.fc5 = nn.Linear(64, 256)
-        self.fc6 = nn.Linear(256, param_vae['x_dim'])
+        self.fc6 = nn.Linear(256, 513)
 
         # Dropout :
         self.dropout = nn.Dropout(p=0.2)

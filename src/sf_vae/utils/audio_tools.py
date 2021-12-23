@@ -4,6 +4,7 @@ from .stft_waveGlow import STFT
 import soundfile as sf
 import librosa
 import numpy as np
+import sounddevice as sd
 
 
 class AudioTools:
@@ -12,7 +13,8 @@ class AudioTools:
         self.mel_basis = torch.from_numpy(mel_basis).float()
         self.stft_waveglow = STFT(filter_length=1024, hop_length=256, win_length=1024, window='hann')
 
-    def load(self, path_wav: str, resample=None):
+    @staticmethod
+    def load(path_wav: str, resample=None):
         sig, rate = sf.read(path_wav)
         if resample is not None:
             sig = librosa.resample(sig, rate, resample)
@@ -50,3 +52,7 @@ class AudioTools:
         C: compression factor
         """
         return torch.log(torch.clamp(x, min=clip_val) * C)
+
+    @staticmethod
+    def play(signal):
+        sd.play(signal, 16000)
