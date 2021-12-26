@@ -86,3 +86,9 @@ class Controlling:
         z_ = self.transform(**kwargs)
         signal_ = self.reconstruction(z_, save=True)
         return signal_
+
+    def whispering(self, path_wav: str = None):
+        self.load_models('f0')
+        z = self.get_z(path_wav)
+        z_ = z - self.ipca(self.pca(z))
+        return z_

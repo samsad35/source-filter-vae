@@ -128,14 +128,6 @@ class Learning:
         my_pwlf.fitfast(num_segments)
         with open(f"{self.path_save}\\pwl_{self.factor}_axe{dim}", 'wb') as f:
             pickle.dump(my_pwlf, f)
-        xHat = np.linspace(min(self.label), max(self.label), num=10000)
-        yHat = my_pwlf.predict(xHat)
-        # plot the results
-        plt.figure()
-        plt.scatter(self.label, x[:, dim], c=self.label)
-        plt.plot(xHat, yHat, 'r-')
-        plt.colorbar()
-        plt.show()
 
     def __call__(self, *args, **kwargs):
         self.get_u()
