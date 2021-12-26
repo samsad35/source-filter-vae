@@ -19,29 +19,33 @@ A link to see the [qualitative results](https://tinyurl.com/iclr2022)
 
 ## User utilisation
 ### Learning 
-    from src import Learning
-    from src import VAE
-    
-    vae = VAE()
-    checkpoint = torch.load(r"checkpoints\vae_trained")
-    vae.load_state_dict(checkpoint['model_state_dict'])
-    learn = Learning(config_factor=dict(factor="f1", path_trajectory="\formant_1\f2-1600", dim=3),
-                    model=vae,
-                    path_save=r"checkpoints\pca-regression")
-    learn()
-    
-    
-    
-### Controlling 
-    from src import Controlling
-    from src import VAE
-    
-    vae = VAE()
-    checkpoint = torch.load(r"checkpoints\vae_trained")
-    vae.load_state_dict(checkpoint['model_state_dict'])
-    control = Controlling(path=r"checkpoints\pca-regression",
-                            model=vae,
-                            device="cuda")
-    control(path_wav=r"01aa0101.wav", y=(85, 300), factor='f0')
+```python
+import torch
+from src import Learning
+from src import VAE
 
+vae = VAE()
+checkpoint = torch.load(r"checkpoints\vae_trained")
+vae.load_state_dict(checkpoint['model_state_dict'])
+learn = Learning(config_factor=dict(factor="f1", path_trajectory="\formant_1\f2-1600", dim=3),
+                model=vae,
+                path_save=r"checkpoints\pca-regression")
+learn()
+```
+    
+    
+### Controlling
+```python
+import torch
+from src import Controlling
+from src import VAE
+
+vae = VAE()
+checkpoint = torch.load(r"checkpoints\vae_trained")
+vae.load_state_dict(checkpoint['model_state_dict'])
+control = Controlling(path=r"checkpoints\pca-regression",
+                        model=vae,
+                        device="cuda")
+control(path_wav=r"01aa0101.wav", y=(85, 300), factor='f0')
+```
 ---
