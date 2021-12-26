@@ -1,4 +1,5 @@
 import torch
+from matplotlib import pyplot as plt
 import librosa
 import pwlf
 import numpy as np
@@ -9,6 +10,7 @@ warnings.filterwarnings(action='ignore')
 
 
 class Learning:
+    mu: np.ndarray
     mean: np.ndarray
     s: np.ndarray
     U: np.ndarray
@@ -17,17 +19,16 @@ class Learning:
     __ratio: list
 
     def __init__(self, config_factor: dict = None, path_save: str = None,
-                 model=None, device='cuda', load: bool = False):
-        if not load:
-            # Information about factor:
-            self.config_factor = config_factor
-            self.factor = self.config_factor['factor']
-            factors = ["f1", "f2", "f3", "f4"]
-            assert self.factor in factors, "The name of the factor should be f1 / f2 / f3 / f0."
-            self.dim = self.config_factor['dim']
-            self.path_trajectory = self.config_factor['path_trajectory']
-            assert bool(self.path_trajectory), "path to trajectory should be defined in the config_factor."
-            self.path_save = path_save
+                 model=None, device='cuda'):
+        # Information about factor:
+        self.config_factor = config_factor
+        self.factor = self.config_factor['factor']
+        factors = ["f1", "f2", "f3", "f0"]
+        assert self.factor in factors, "The name of the factor should be f1 / f2 / f3 / f0."
+        self.dim = self.config_factor['dim']
+        self.path_trajectory = self.config_factor['path_trajectory']
+        assert bool(self.path_trajectory), "path to trajectory should be defined in the config_factor."
+        self.path_save = path_save
         # Model :
         self.model = model
         # Device:
@@ -92,15 +93,15 @@ class Learning:
         """
         self.get_s()
         w, V = np.linalg.eigh(self.s)
-        eigenvalues = w[-1::-1]  # we choose an decreasing ordering of the eigenvalues
+        eigenvalues = w[-1::-1]  # an decreasing ordering of the eigenvalues
         eigenvectors = V[:, -1::-1]
         tot = np.sum(eigenvalues)
         self.U = eigenvectors[:, :self.dim]
         self.eigenvalues = eigenvalues[:self.dim]
         self.__ratio = [round((value * 100/tot)/100, 8) for value in self.eigenvalues]
         print(f' \t [factor = {self.factor}] [dim = {self.dim}] [variance retained = {np.sum(self.__ratio) * 100}]')
-        pickle.dump(dict(u=self.U, eigenvalues=self.eigenvalues,
-                         ratio=self.__ratio, mean=self.mean), open(f"{self.path_save}\\pca_{self.factor}.pkl", 'wb'))
+        with open(f"{self.path_save}\\pca_{self.factor}", 'wb') as f:
+            pickle.dump(dict(u=self.U, eigenvalues=self.eigenvalues, ratio=self.__ratio, mean=self.mean), f)
 
     def pca(self, data: np.ndarray):
         """
@@ -122,11 +123,21 @@ class Learning:
 
         :return:
         """
-        my_pwlf = pwlf.PiecewiseLinFit(self.label, self.mu[:, dim])
+        x = self.pca(self.mu)
+        my_pwlf = pwlf.PiecewiseLinFit(self.label, x[:, dim])
         my_pwlf.fitfast(num_segments)
-        pickle.dump(my_pwlf, open(f"{self.path_save}\\pwl_{self.factor}_axe{dim}.pkl", 'wb'))
+        with open(f"{self.path_save}\\pwl_{self.factor}_axe{dim}", 'wb') as f:
+            pickle.dump(my_pwlf, f)
+        xHat = np.linspace(min(self.label), max(self.label), num=10000)
+        yHat = my_pwlf.predict(xHat)
+        # plot the results
+        plt.figure()
+        plt.scatter(self.label, x[:, dim], c=self.label)
+        plt.plot(xHat, yHat, 'r-')
+        plt.colorbar()
+        plt.show()
 
     def __call__(self, *args, **kwargs):
         self.get_u()
         for i in range(self.dim):
-            self.regression(dim=i, num_segments=15)
+            self.regression(dim=i, num_segments=20)

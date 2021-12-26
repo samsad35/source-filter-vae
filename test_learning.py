@@ -27,9 +27,9 @@ class TestAudioTools(unittest.TestCase):
         vae = VAE()
         checkpoint = torch.load(r"checkpoints\vae_trained")
         vae.load_state_dict(checkpoint['model_state_dict'])
-        learn = Learning(config_factor=dict(factor="f1",
-                                            path_trajectory=r"D:\These\data\Audio\Phonemes\vowel\synthesis_soundgen\formant_1\f2-1600",
-                                            dim=3), model=vae, path_save=r"checkpoints\pca-regression")
+        learn = Learning(config_factor=dict(factor="f0",
+                                            path_trajectory=r"D:\These\data\Audio\Phonemes\vowel\synthesis_soundgen\pitch\f1-600_f2-1500",
+                                            dim=4), model=vae, path_save=r"checkpoints\pca-regression")
         learn()
 
 

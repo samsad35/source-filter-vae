@@ -2,8 +2,11 @@ librosa==0.8.0
 matplotlib==3.3.3
 numpy==1.21.5
 parselmouth==1.1.1
+pwlf==2.0.4
 pypesq==1.2.4
 scipy==1.7.1
 seaborn==0.11.1
+sounddevice==0.4.1
 SoundFile==0.10.3.post1
 torch==1.7.1
+torch_specinv==0.1
