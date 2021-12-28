@@ -1,7 +1,7 @@
 import unittest
 import torch
-from src import Controlling
-from src import VAE
+from sf_vae import Controlling
+from sf_vae import VAE
 
 
 class TestAudioTools(unittest.TestCase):

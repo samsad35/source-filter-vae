@@ -1,0 +1,9 @@
+*.wav
+*.hdf5
+*.pyc
+*.sav
+*.pkl
+*.xml
+/*.egg-info
+/*.egg
+/dist/

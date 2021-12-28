@@ -73,13 +73,13 @@ class Controlling:
         z_ = z - self.ipca(self.pca(z)) + self.ipca(np.array(g))
         return z_
 
-    def reconstruction(self, z, save: bool = False):
+    def reconstruction(self, z, save: bool = False, path_new_wav: str = "out.wav"):
         spec = self.model.decode(torch.from_numpy(z).type(torch.FloatTensor).to(self.device))
         spec = torch.sqrt(spec)
         spec = torch.transpose(spec, 0, 1).detach().cpu().numpy()
         signal_recons = RTISI_LA(torch.from_numpy(spec), maxiter=50).numpy()
         if save:
-            write("out.wav", 16000, signal_recons)
+            write(path_new_wav, 16000, signal_recons)
         return signal_recons
 
     def __call__(self, *args, **kwargs):

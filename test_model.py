@@ -1,5 +1,5 @@
 import unittest
-from src import VAE
+from sf_vae import VAE
 import torch
 
 

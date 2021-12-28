@@ -1,5 +1,5 @@
 import unittest
-from src import AudioTools
+from sf_vae import AudioTools
 
 
 class TestAudioTools(unittest.TestCase):
