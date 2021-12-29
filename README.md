@@ -2,6 +2,8 @@
 # Learning and controlling the source-filter representation of speech with a variational autoencoder
 [![Generic badge](https://img.shields.io/badge/<STATUS>-<in_progress>-<COLOR>.svg)](https://shields.io/)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
+[![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://tinyurl.com/iclr2022)
+[![PyPI version shields.io](https://img.shields.io/pypi/v/ansicolortags.svg)](https://test.pypi.org/project/sf-vae/)
 ## Abstract
 
 Understanding and controlling latent representations in deep generative models is a challenging yet important problem 
