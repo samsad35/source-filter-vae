@@ -64,14 +64,18 @@ class Controlling:
             p.append(point)
         return p
 
-    def transform(self, path_wav: str = None, factor: str = None, y: tuple = None):
+    def transform(self, path_wav: str = None, factor: str = None, y=None):
         assert factor in ['f1', 'f2', 'f3', 'f0'], "Name of factor problem."
         self.load_models(factor)
         z = self.get_z(path_wav)
-        y = np.linspace(y[0], y[1], z.shape[0])
+        if type(y) == tuple:
+            y = np.linspace(y[0], y[1], z.shape[0])
         g = self.regression(y)
-        z_ = z - self.ipca(self.pca(z)) + self.ipca(np.array(g))
-        return z_
+        if y.any():
+            z_ = z - self.ipca(self.pca(z)) + self.ipca(np.array(g))
+            return z_
+        else:
+            return z
 
     def reconstruction(self, z, save: bool = False, path_new_wav: str = "out.wav"):
         spec = self.model.decode(torch.from_numpy(z).type(torch.FloatTensor).to(self.device))
@@ -82,9 +86,9 @@ class Controlling:
             write(path_new_wav, 16000, signal_recons)
         return signal_recons
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, path_new_wav: str = "out.wav", *args, **kwargs):
         z_ = self.transform(**kwargs)
-        signal_ = self.reconstruction(z_, save=True)
+        signal_ = self.reconstruction(z_, save=True, path_new_wav=path_new_wav)
         return signal_
 
     def whispering(self, path_wav: str = None):

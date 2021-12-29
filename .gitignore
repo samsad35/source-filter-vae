@@ -3,6 +3,7 @@
 *.pyc
 *.sav
 *.pkl
+*.png
 *.xml
 /*.egg-info
 /*.egg

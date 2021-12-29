@@ -79,3 +79,17 @@ control = Controlling(path=r"checkpoints\pca-regression",
 z_ = control.whispering(path_wav=r"01aa0101.wav")
 control.reconstruction(z_, save=True)
 ```
+
+## GUI: graphic interface
+```python
+from sf_vae import Interface
+from sf_vae import VAE
+import torch
+
+vae = VAE()
+checkpoint = torch.load(r"checkpoints\vae_trained")
+vae.load_state_dict(checkpoint['model_state_dict'])
+inter = Interface(device="cuda", model=vae, path=r"checkpoints\pca-regression")
+inter.master.mainloop()
+```
+![image](images/interface.jpeg)

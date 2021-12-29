@@ -20,6 +20,13 @@ class Learning:
 
     def __init__(self, config_factor: dict = None, path_save: str = None,
                  model=None, device='cuda'):
+        """
+
+        :param config_factor:
+        :param path_save:
+        :param model:
+        :param device:
+        """
         # Information about factor:
         self.config_factor = config_factor
         self.factor = self.config_factor['factor']
@@ -121,6 +128,8 @@ class Learning:
     def regression(self, dim: int = 0, num_segments: int = 3):
         """
 
+        :param dim:
+        :param num_segments:
         :return:
         """
         x = self.pca(self.mu)

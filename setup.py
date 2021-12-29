@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-setup(name="sf_vae", version='0.1',
+setup(name="sf_vae", version='0.2',
       description="Learning and controlling the source-filter representation of speech with a variational autoencoder",
       url="https://github.com/samsad35/source-filter-vae",
       project_url="https://sites.google.com/view/sturnus",
