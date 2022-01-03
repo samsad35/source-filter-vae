@@ -21,8 +21,7 @@ and which is applied to the transformation of speech signals.
 
 - A link to see the [qualitative results](https://tinyurl.com/iclr2022).
 
-
-## Setup
+##Setup 
 - [x] Pypi:  
   - ```pip install -i https://test.pypi.org/simple/ sf-vae --no-deps```
 - [x] Install the package locally (for use on your system):  
@@ -98,3 +97,6 @@ inter = Interface(device="cuda", model=vae, path=r"checkpoints\pca-regression")
 inter.master.mainloop()
 ```
 ![image](images/interface.jpeg)
+
+## License
+GNU Affero General Public License (version 3), see LICENSE.txt.
