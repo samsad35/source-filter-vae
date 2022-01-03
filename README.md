@@ -20,6 +20,7 @@ deep generative model of speech spectrograms that is conditioned on the fundamen
 and which is applied to the transformation of speech signals.
 
 - A link to see the [qualitative results](https://tinyurl.com/iclr2022).
+- A link to the [paper](https://openreview.net/pdf?id=zxEfpcmTDnF) 
 
 ## Setup 
 - [x] Pypi:  
