@@ -76,7 +76,6 @@ class VAE(nn.Module):
     def loss_function(recon_x, x, mu, logvar, beta=1):
         # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
         # https://arxiv.org/abs/1312.6114
-
         recon = torch.sum(x / recon_x - torch.log(x / recon_x) - 1)
         KLD = -0.5 * torch.sum(logvar - mu.pow(2) - logvar.exp())
         return {'loss_recon': recon, 'kld': KLD, 'loss_total': recon + beta * KLD}

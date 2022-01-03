@@ -1,9 +1,9 @@
 
 # Learning and controlling the source-filter representation of speech with a variational autoencoder
-[![Generic badge](https://img.shields.io/badge/<STATUS>-<in_progress>-<COLOR>.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/<STATUS>-<in_progress>-<COLOR>.svg)](https://github.com/samsad35/source-filter-vae)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://tinyurl.com/iclr2022)
-[![PyPI version shields.io](https://img.shields.io/pypi/v/ansicolortags.svg)](https://test.pypi.org/project/sf-vae/)
+[![PyPI version fury.io](https://badge.fury.io/py/ansicolortags.svg)](https://test.pypi.org/project/sf-vae/)
 ## Abstract
 
 Understanding and controlling latent representations in deep generative models is a challenging yet important problem 
@@ -24,7 +24,7 @@ and which is applied to the transformation of speech signals.
 
 ## Setup
 - [x] Pypi:  
-  - ```pip install -i https://test.pypi.org/simple/ sf-vae```
+  - ```pip install -i https://test.pypi.org/simple/ sf-vae --no-deps```
 - [x] Install the package locally (for use on your system):  
   - In source-filter-vae directoy: ```pip install -e .```
 - [x] Virtual Environment: 
@@ -65,7 +65,10 @@ control(path_wav=r"01aa0101.wav",
         factor='f0', # f0: pitch (source), f1, f2, f3: formants (filter)
         y=(85, 300)) # The new values of the factor in Hz
 ```
-
+* Phase reconstruction method:
+  * [x] RTISI_LA
+  * [ ] Griffin_lim
+  * [ ] WaveGlow
 * Whispering
 ```python
 import torch
