@@ -20,13 +20,6 @@ class Learning:
 
     def __init__(self, config_factor: dict = None, path_save: str = None,
                  model=None, device='cuda'):
-        """
-
-        :param config_factor:
-        :param path_save:
-        :param model:
-        :param device:
-        """
         # Information about factor:
         self.config_factor = config_factor
         self.factor = self.config_factor['factor']
@@ -52,7 +45,7 @@ class Learning:
 
     def encoder(self, path: str, limitation: tuple = None):
         """
-
+            Get the mean, logvar and z.
         :param path:
         :param limitation:
         :return:
@@ -112,7 +105,7 @@ class Learning:
 
     def pca(self, data: np.ndarray):
         """
-
+            PCA transform.
         :param data:
         :return:
         """
@@ -120,15 +113,15 @@ class Learning:
 
     def ipca(self, p: np.ndarray):
         """
-
+            Inverse-PCA transform.
         :return:
         """
         return (p @ self.U.T) + self.mean
 
-    def regression(self, dim: int = 0, num_segments: int = 3):
+    def regression(self, dim: int = 0, num_segments: int = 15):
         """
-
-        :param dim:
+            Learn the regression parameters and save them.
+        :param dim: the dimension to retain.
         :param num_segments:
         :return:
         """

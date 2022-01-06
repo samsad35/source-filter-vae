@@ -20,7 +20,7 @@ deep generative model of speech spectrograms that is conditioned on the fundamen
 and which is applied to the transformation of speech signals.
 
 - A link to see the [qualitative results](https://tinyurl.com/iclr2022).
-- A link to the [paper](https://openreview.net/pdf?id=zxEfpcmTDnF) 
+- A link to the [paper](https://openreview.net/pdf?id=zxEfpcmTDnF). 
 
 ## Setup 
 - [x] Pypi:  
@@ -48,7 +48,7 @@ learn = Learning(config_factor=dict(factor="f1", path_trajectory="formant_1\\f2-
                 path_save=r"checkpoints\pca-regression")
 learn()
 ```
-
+- You can download the trajectories of the formants and the pitch in the [following link](https://drive.google.com/file/d/1807TYczP9qp9N-47s-cGyn7vxft0RqvI/view?usp=sharing).
 ### CONTROLLING THE FACTORS OF VARIATION FOR SPEECH TRANSFORMATION
 ```python
 import torch

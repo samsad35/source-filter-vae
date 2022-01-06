@@ -24,6 +24,11 @@ class Controlling:
         self.tools = AudioTools()
 
     def get_z(self, path: str):
+        """
+
+        :param path:
+        :return:
+        """
         signal, fs = self.tools.load(path, resample=16000)
         assert len(signal.shape) == 1, "Dimension of signal is incorrect"
         mel, magnitude, phase = self.tools.stft(signal)
@@ -31,6 +36,11 @@ class Controlling:
         return z.detach().cpu().numpy()
 
     def load_models(self, factor):
+        """
+            Load PCA + Regression parameters.
+        :param factor: f0 -> (source), f1, f2, f3 -> (filter).
+        :return: void.
+        """
         with open(f"{self.path}\\pca_{factor}", 'rb') as f:
             pca = pickle.load(f)
             self.U, self.mean, self.eigenvalues, self.__ratio = pca['u'], pca['mean'], pca['eigenvalues'], pca['ratio']
@@ -65,6 +75,13 @@ class Controlling:
         return p
 
     def transform(self, path_wav: str = None, factor: str = None, y=None):
+        r"""
+            CONTROLLING THE FACTORS OF VARIATION FOR SPEECH TRANSFORMATION
+        :param path_wav: The path to .wav file.
+        :param factor: f0 -> (source), f1, f2, f3 -> (filter).
+        :param y: The new values of the factor in Hz.
+        :return: The new Z.
+        """
         assert factor in ['f1', 'f2', 'f3', 'f0'], "Name of factor problem."
         self.load_models(factor)
         z = self.get_z(path_wav)
@@ -78,6 +95,13 @@ class Controlling:
             return z
 
     def reconstruction(self, z, save: bool = False, path_new_wav: str = "out.wav"):
+        """
+            Get the audio signal from latent space vae Z
+        :param z: latent space.
+        :param save: True if you would to save the output signal audio.
+        :param path_new_wav: the path/name of the new output signal audio if save == True.
+        :return: the output signal audio
+        """
         spec = self.model.decode(torch.from_numpy(z).type(torch.FloatTensor).to(self.device))
         spec = torch.sqrt(spec)
         spec = torch.transpose(spec, 0, 1).detach().cpu().numpy()
@@ -92,6 +116,11 @@ class Controlling:
         return signal_
 
     def whispering(self, path_wav: str = None):
+        """
+            Whispering
+        :param path_wav: the path to .wav file.
+        :return: The new Z.
+        """
         self.load_models('f0')
         z = self.get_z(path_wav)
         z_ = z - self.ipca(self.pca(z))

@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+# from .base import BASE
 
 
 class VAE(nn.Module):
@@ -30,7 +31,7 @@ class VAE(nn.Module):
 
     def encode(self, x):
         """
-
+            Encoder.
         :param x:
         :return:
         """
@@ -52,8 +53,8 @@ class VAE(nn.Module):
 
     def decode(self, z):
         """
-
-        :param z:
+            Decoder
+        :param z: latent space.
         :return:
         """
         z = self.activation(self.fc4(z))
@@ -63,7 +64,7 @@ class VAE(nn.Module):
 
     def forward(self, x):
         """
-
+            Encoder + Decoder
         :param x:
         :return:
         """
@@ -74,6 +75,15 @@ class VAE(nn.Module):
 
     @staticmethod
     def loss_function(recon_x, x, mu, logvar, beta=1):
+        """
+            ELBO.
+        :param recon_x:
+        :param x:
+        :param mu:
+        :param logvar:
+        :param beta:
+        :return:
+        """
         # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
         # https://arxiv.org/abs/1312.6114
         recon = torch.sum(x / recon_x - torch.log(x / recon_x) - 1)
