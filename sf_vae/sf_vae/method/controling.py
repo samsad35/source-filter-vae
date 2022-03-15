@@ -1,6 +1,8 @@
 import pickle
 import numpy as np
 import torch
+from scipy.signal import get_window
+from librosa.util import pad_center, tiny
 from torch_specinv.methods import RTISI_LA
 from scipy.io.wavfile import write
 from ..utils import AudioTools
@@ -105,10 +107,18 @@ class Controlling:
         spec = self.model.decode(torch.from_numpy(z).type(torch.FloatTensor).to(self.device))
         spec = torch.sqrt(spec)
         spec = torch.transpose(spec, 0, 1).detach().cpu().numpy()
-        signal_recons = RTISI_LA(torch.from_numpy(spec), maxiter=50).numpy()
+        window = get_window(window=self.tools.stft_waveglow.window,
+                            Nx=self.tools.stft_waveglow.win_length, fftbins=True)
+        window = pad_center(window, self.tools.stft_waveglow.filter_length)
+        window = torch.from_numpy(window).float()
+
+        signal_recons = RTISI_LA(torch.from_numpy(spec),
+                                 hop_length=self.tools.stft_waveglow.hop_length,
+                                 win_length=self.tools.stft_waveglow.win_length,
+                                 window=window).numpy()
         if save:
             write(path_new_wav, 16000, signal_recons)
-        return signal_recons
+        return signal_recons, spec
 
     def __call__(self, path_new_wav: str = "out.wav", *args, **kwargs):
         z_ = self.transform(**kwargs)

@@ -4,6 +4,8 @@ import tkinter
 from tkinter import *
 import matplotlib.pyplot as plt
 import torch
+import librosa
+import librosa.display as display
 from tkinter.filedialog import *
 from tkinter import messagebox
 import numpy as np
@@ -134,9 +136,28 @@ class Interface:
                         (alpha, np.linspace(self.list_formant[i - 1], self.list_formant[i], self.z_time[i] - self.z_time[i - 1])))
             alpha = np.concatenate(
                 (alpha, np.linspace(self.list_formant[-1], self.list_formant[-1], self.z.shape[0] - alpha.shape[0])))
-        self.control(path_wav=self.path_wav, y=alpha, factor=self.switch_formant.get(), path_new_wav="out.wav")
+        if self.modify_bool.get():
+            z_ = self.control.whispering(path_wav=self.path_wav)
+            _, spec = self.control.reconstruction(z_, save=True, path_new_wav="out.wav")
+        else:
+            _, spec = self.control(path_wav=self.path_wav, y=alpha, factor=self.switch_formant.get(), path_new_wav="out.wav")
         praat = Praat(file_name=f'{self.cwd}\\out.wav', num_formant=int(self.praat_num.get()))
-        praat.draw_formant_pitch(save=False, draw=True)
+        pitch_values, pitch = praat.get_pitch(median_filter=False)
+        # praat.draw_formant_pitch(save=False, draw=True)
+        pitch_values[pitch_values == 0] = np.nan
+        fig, ax = plt.subplots(figsize=(10, 3))
+        img = display.specshow(librosa.amplitude_to_db(spec, ref=np.max), y_axis='linear',
+                               x_axis='time', cmap='magma', sr=16000, hop_length=256)
+        plt.ylim(0, 4000)
+        plt.ylabel('Frequency (Hz)', fontsize=18)
+        plt.xlabel('Time (s)', fontsize=18)
+        plt.plot(pitch.xs(), pitch_values, 'o', markersize=2, color='w')
+        plt.plot(pitch.xs(), pitch_values, 'o', markersize=1, color='b')
+        fig.colorbar(img, ax=ax, format="%+2.0f dB")
+        plt.tight_layout()
+        # plt.savefig("fig_.svg")
+        # plt.savefig("fig_.eps")
+        plt.show()
         self.signal_recons, sr = self.tools.load(path_wav="out.wav", resample=16000)
         Button(self.master, text="Play", command=self.play_).place(relx=0.9, rely=0.95, anchor=CENTER)
 
