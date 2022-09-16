@@ -8,3 +8,7 @@
 /*.egg-info
 /*.egg
 /dist/
+sf_vae/sf_vae/f0_detection/**
+test_f0estimation.py
+/H5/
+

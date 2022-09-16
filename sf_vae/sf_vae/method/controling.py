@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from scipy.signal import get_window
 from librosa.util import pad_center, tiny
-from torch_specinv.methods import RTISI_LA
+from torch_specinv.methods import RTISI_LA, griffin_lim
 from scipy.io.wavfile import write
 from ..utils import AudioTools
 
@@ -25,31 +25,39 @@ class Controlling:
         # Tools :
         self.tools = AudioTools()
 
-    def get_z(self, path: str):
+    def get_z(self, path: str = None, signal: np.ndarray = None, return_logvar=False):
         """
 
+        :param signal:
         :param path:
         :return:
         """
-        signal, fs = self.tools.load(path, resample=16000)
+        if signal is None:
+            signal, fs = self.tools.load(path, resample=16000)
         assert len(signal.shape) == 1, "Dimension of signal is incorrect"
         mel, magnitude, phase = self.tools.stft(signal)
+        # self.tools.plot_spectrogram(magnitude.numpy())
         _, mu, var, z = self.model(torch.transpose(magnitude ** 2, 0, 1).to(self.device))
-        return z.detach().cpu().numpy()
+        if return_logvar:
+            return z.detach().cpu().numpy(), mu.detach().cpu().numpy(), var.detach().cpu().numpy()
+        else:
+            return z.detach().cpu().numpy(), mu.detach().cpu().numpy()
 
-    def load_models(self, factor):
+    def load_models(self, factor, load_regression: bool = True):
         """
             Load PCA + Regression parameters.
+        :param load_regression:
         :param factor: f0 -> (source), f1, f2, f3 -> (filter).
         :return: void.
         """
         with open(f"{self.path}\\pca_{factor}", 'rb') as f:
             pca = pickle.load(f)
             self.U, self.mean, self.eigenvalues, self.__ratio = pca['u'], pca['mean'], pca['eigenvalues'], pca['ratio']
-        self.pwl = []
-        for i in range(len(self.eigenvalues)):
-            with open(f"{self.path}\\pwl_{factor}_axe{i}", 'rb') as f:
-                self.pwl.append(pickle.load(f))
+        if load_regression:
+            self.pwl = []
+            for i in range(len(self.eigenvalues)):
+                with open(f"{self.path}\\pwl_{factor}_axe{i}", 'rb') as f:
+                    self.pwl.append(pickle.load(f))
         print(f"Models pca + Regression loaded successfully [{factor}, ratio: {np.sum(self.__ratio) * 100}] ")
 
     def pca(self, data: np.ndarray) -> np.ndarray:
@@ -86,7 +94,7 @@ class Controlling:
         """
         assert factor in ['f1', 'f2', 'f3', 'f0'], "Name of factor problem."
         self.load_models(factor)
-        z = self.get_z(path_wav)
+        z, _ = self.get_z(path_wav)
         if type(y) == tuple:
             y = np.linspace(y[0], y[1], z.shape[0])
         g = self.regression(y)
@@ -96,9 +104,17 @@ class Controlling:
         else:
             return z
 
-    def reconstruction(self, z, save: bool = False, path_new_wav: str = "out.wav"):
+    def projection(self, path_wav: str = None, factor: str = None):
+        assert factor in ['f1', 'f2', 'f3', 'f0'], "Name of factor problem."
+        self.load_models(factor)
+        z, _ = self.get_z(path_wav)
+        return self.ipca(self.pca(z))
+
+    def reconstruction(self, z, save: bool = False, path_new_wav: str = "out.wav",
+                       method_reconstruction="RTISI"):
         """
             Get the audio signal from latent space vae Z
+        :param method_reconstruction:
         :param z: latent space.
         :param save: True if you would to save the output signal audio.
         :param path_new_wav: the path/name of the new output signal audio if save == True.
@@ -111,18 +127,31 @@ class Controlling:
                             Nx=self.tools.stft_waveglow.win_length, fftbins=True)
         window = pad_center(window, self.tools.stft_waveglow.filter_length)
         window = torch.from_numpy(window).float()
+        if method_reconstruction.upper() == "RTISI":
+            signal_recons = RTISI_LA(torch.from_numpy(spec),
+                                     hop_length=self.tools.stft_waveglow.hop_length,
+                                     win_length=self.tools.stft_waveglow.win_length,
+                                     window=window).numpy()
+        elif method_reconstruction.upper() == "GRIFFIN":
+            signal_recons = griffin_lim(torch.from_numpy(spec), maxiter=100, alpha=0.3, window=window,
+                                        hop_length=self.tools.stft_waveglow.hop_length,
+                                        win_length=self.tools.stft_waveglow.win_length).numpy()
+        elif method_reconstruction.upper() == "WAVEGLOW":
+            # --- WaveGlow ---
+            mel_recon = self.tools.spec2mel(spec)  # numpy array
+            melspectrogram_reconstructed = self.tools.dynamic_range_compression(mel_recon)
+            signal_recons = self.tools.audio_reconstruction_waveGlow(melspectrogram_reconstructed.cuda())
+        else:
+            raise Exception('choose: RTISI or GRIFFIN or WAVEGLOW as method of reconstruction')
 
-        signal_recons = RTISI_LA(torch.from_numpy(spec),
-                                 hop_length=self.tools.stft_waveglow.hop_length,
-                                 win_length=self.tools.stft_waveglow.win_length,
-                                 window=window).numpy()
         if save:
             write(path_new_wav, 16000, signal_recons)
         return signal_recons, spec
 
-    def __call__(self, path_new_wav: str = "out.wav", *args, **kwargs):
+    def __call__(self, path_new_wav: str = "out.wav", method_reconstruction="RTISI", *args, **kwargs):
         z_ = self.transform(**kwargs)
-        signal_ = self.reconstruction(z_, save=True, path_new_wav=path_new_wav)
+        signal_ = self.reconstruction(z_, save=True, path_new_wav=path_new_wav,
+                                      method_reconstruction=method_reconstruction)
         return signal_
 
     def whispering(self, path_wav: str = None):
@@ -132,6 +161,17 @@ class Controlling:
         :return: The new Z.
         """
         self.load_models('f0')
-        z = self.get_z(path_wav)
+        z, _ = self.get_z(path_wav)
         z_ = z - self.ipca(self.pca(z))
         return z_
+
+    def test_(self, path_wav: str = None, signal: np.ndarray = None, return_logvar=False):
+        z, _ = self.get_z(path_wav, signal=signal)
+        z = self.ipca(self.pca(z))
+        x = self.model.decode(torch.from_numpy(z).type(torch.FloatTensor).to(self.device))
+        # self.tools.plot_spectrogram(torch.transpose(torch.sqrt(x), 0, 1).detach().cpu().numpy())
+        _, mu, log_var, _ = self.model(x)
+        if return_logvar:
+            return mu.detach().cpu().numpy(), log_var.detach().cpu().numpy()
+        else:
+            return mu.detach().cpu().numpy()

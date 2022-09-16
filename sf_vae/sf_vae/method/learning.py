@@ -63,14 +63,16 @@ class Learning:
 
         :return:
         """
-        self.mu, self.var, self.label = [], [], []
+        self.mu, self.var, self.label, self.z = [], [], [], []
         for file, label in self.generator():
             mu, var, z = self.encoder(file, limitation=(3000, 6000))
             self.mu.append(torch.mean(mu, 0).numpy())
+            self.z.append(torch.mean(z, 0).numpy())
             self.var.append(torch.mean(var, 0).numpy())
             self.label.append(label)
         self.mu = np.array(self.mu)
         self.var = np.array(self.var)
+        self.z = np.array(self.z)
 
     def get_s(self):
         """

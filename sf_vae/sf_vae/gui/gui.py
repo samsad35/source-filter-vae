@@ -65,7 +65,7 @@ class Interface:
                                    filetypes=[('wav files', '.wav'), ('all files', '.*')])
         self.signal, fs = self.tools.load(self.path_wav, resample=16000)
         write("OUT.wav", fs, self.signal)
-        self.z = self.control.get_z(self.path_wav)
+        self.z, _ = self.control.get_z(self.path_wav)
         self.time = np.linspace(0, self.signal.shape[0], self.signal.shape[0]) / fs
         Button(self.master, text="Play", command=self.play).place(relx=0.2, rely=0.1, anchor=CENTER)
         Button(self.master, text="Go", command=self.run).place(relx=0.5, rely=0.95, anchor=CENTER)
@@ -138,9 +138,13 @@ class Interface:
                 (alpha, np.linspace(self.list_formant[-1], self.list_formant[-1], self.z.shape[0] - alpha.shape[0])))
         if self.modify_bool.get():
             z_ = self.control.whispering(path_wav=self.path_wav)
-            _, spec = self.control.reconstruction(z_, save=True, path_new_wav="out.wav")
+            _, spec = self.control.reconstruction(z_,
+                                                  save=True,
+                                                  path_new_wav="out.wav",
+                                                  method_reconstruction="WAVEGLOW")
         else:
-            _, spec = self.control(path_wav=self.path_wav, y=alpha, factor=self.switch_formant.get(), path_new_wav="out.wav")
+            _, spec = self.control(path_wav=self.path_wav, y=alpha, factor=self.switch_formant.get(),
+                                   path_new_wav="out.wav", method_reconstruction="WAVEGLOW")
         praat = Praat(file_name=f'{self.cwd}\\out.wav', num_formant=int(self.praat_num.get()))
         pitch_values, pitch = praat.get_pitch(median_filter=False)
         # praat.draw_formant_pitch(save=False, draw=True)
