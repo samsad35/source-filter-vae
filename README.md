@@ -4,23 +4,17 @@
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://tinyurl.com/iclr2022)
 [![PyPI version fury.io](https://badge.fury.io/py/ansicolortags.svg)](https://test.pypi.org/project/sf-vae/)
-## Abstract
 
-Understanding and controlling latent representations in deep generative models is a challenging yet important problem 
-for analyzing, transforming and generating various types of data. In speech processing, inspiring from the anatomical 
-mechanisms of phonation, the source-filter model considers that speech signals are produced from a few independent and 
-physically meaningful continuous latent factors, among which the fundamental frequency and the formants are of primary 
-importance. In this work, we show that the source-filter model of speech production naturally arises in the latent space
-of a variational autoencoder (VAE) trained in an unsupervised fashion on a dataset of natural speech signals. Using only
-a few seconds of labeled speech signals generated with an artificial speech synthesizer, we experimentally demonstrate
-that the fundamental frequency and formant frequencies are encoded in orthogonal subspaces of the VAE latent space and
-we develop a weakly-supervised method to accurately and independently control these speech factors of variation within 
-the learned latent subspaces. Without requiring additional information such as text or human-labeled data, we propose a
-deep generative model of speech spectrograms that is conditioned on the fundamental frequency and formant frequencies,
-and which is applied to the transformation of speech signals.
+This repository contains the code associated with the following publication:
+> **Learning and controlling the source-filter representation of speech with a variational autoencoder**<br> Samir Sadok, Simon Leglaive, Laurent Girin, Xavier Alameda-Pineda, Renaud Séguier<br>Speech Communication, vol. 148, 2023.
 
-- A link to see the [qualitative results](https://tinyurl.com/iclr2022).
-- A link to the [paper](https://openreview.net/pdf?id=zxEfpcmTDnF). 
+If you use this code for your research, please cite the above paper.
+
+Useful links:
+- [Abstract](https://arxiv.org/abs/2204.07075)
+- [Paper](https://arxiv.org/pdf/2204.07075.pdf)
+- [Demo website with qualitative results](https://samsad35.github.io/site-sfvae/)
+
 
 ## Setup 
 - [x] Pypi:  
